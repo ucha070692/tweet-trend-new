@@ -20,6 +20,16 @@ pipeline {
                 sh 'mvn deploy -DskipTests=true'
             }
         }
+
+        stage('sonarQube Analysis') {
+        environment{
+            scannerHome = tool 'valaxy-sonar-scanner'
+        }
+        steps {
+        withSonarQubeEnv('valaxy-sonarqube-server') {
+            sh "${scannerHome}/bin/sonar-scanner"
+        }
+      }
     }
 
     post {
