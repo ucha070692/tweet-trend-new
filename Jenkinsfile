@@ -9,7 +9,6 @@ pipeline {
     stages {
         stage('Build & Test') {
             steps {
-                // Skip tests if Surefire keeps crashing
                 sh 'mvn clean install -DskipTests=false -Djacoco.skip=true'
             }
         }
@@ -22,15 +21,16 @@ pipeline {
         }
 
         stage('sonarQube Analysis') {
-        environment{
-            scannerHome = tool 'valaxy-sonar-scanner'
+            environment {
+                scannerHome = tool 'valaxy-sonar-scanner'
+            }
+            steps {
+                withSonarQubeEnv('valaxy-sonarqube-server') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
+            }
         }
-        steps {
-        withSonarQubeEnv('valaxy-sonarqube-server') {
-            sh "${scannerHome}/bin/sonar-scanner"
-        }
-      }
-    }
+    } // ✅ THIS WAS MISSING
 
     post {
         always { echo "Build finished!" }
